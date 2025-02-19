@@ -8,7 +8,12 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     public GameStep Currentstep;
+
     [SerializeField] GameObject[] contensts;
+    [SerializeField] float LoadTitleTime;
+    
+    int endButtonClickCount;
+    float LoadTitleTimer;
     public enum GameStep
     {
         Title,
@@ -31,6 +36,23 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
 
         DontDestroyOnLoad(gameObject);
+    }
+
+    void Update()
+    {
+        if (Input.touchCount > 0 || Input.GetMouseButton(0)) 
+        {
+            LoadTitleTimer = 0;
+            return;
+        }
+
+        LoadTitleTimer += Time.deltaTime;
+
+        if (LoadTitleTimer >= LoadTitleTime) 
+        {
+            LoadTitleTimer = 0;
+            LoadTitle();
+        }
     }
 
     public void MoveNextStep() 
@@ -81,6 +103,22 @@ public class GameManager : MonoBehaviour
                 contensts[i].SetActive(false);
         }
 
+    }
+
+    public void IncreaseEndButtonClickCount() 
+    {
+        endButtonClickCount++;
+
+        if (endButtonClickCount >= 8) 
+        {
+            endButtonClickCount = 0;
+
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
     }
 
     
